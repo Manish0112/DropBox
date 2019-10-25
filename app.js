@@ -5,6 +5,9 @@ const flash=require('connect-flash');
 const session=require('express-session');
 const passport=require('passport');
 
+//for file upload
+// const multer = require("multer");
+
 const app=express();
 
 //passport config
@@ -23,6 +26,7 @@ app.use(expressLayouts);
 app.set('view engine','ejs');
 
 //BodyParser
+app.use(express.json());
 app.use(express.urlencoded({ extented:false}));
 
 //Express session
@@ -48,9 +52,9 @@ app.use((req,res,next) => {
 });
 
 //Routes
-app.use('/',require('./routes/file-upload'));
 app.use('/',require('./routes/index'));
 app.use('/users',require('./routes/users'));
+app.use('/upload',require('./routes/file-upload'));
 
 const PORT = process.env.PORT || 5000;
 
