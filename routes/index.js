@@ -13,13 +13,25 @@ router.get('/dashboard',ensureAuthenticated,(req,res)=>{
 
     const user =req.user;
 
-    Files.find({ email : req.user.email},(err, data) => {
-        //console.log(data);
-        res.render('dashboard',{
-            user: user,
-            data: data
+    if(req.user.name == 'admin'){
+
+        Files.find({ },(err, data) => {
+            //console.log(data);
+            res.render('dashboard',{
+                user: user,
+                data: data
+            })
         })
-    })
+    }
+    else{
+        Files.find({ email : req.user.email },(err, data) => {
+            //console.log(data);
+            res.render('dashboard',{
+                user: user,
+                data: data
+            })
+        })
+    }
 
 });
 

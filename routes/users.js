@@ -60,7 +60,8 @@ router.post('/register', (req,res)=>{
                 const newUser = new User({
                     name,
                     email,
-                    password
+                    password,
+                    level: 'U'
                 });
 
                 //Hash password
