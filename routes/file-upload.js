@@ -1,13 +1,13 @@
-var express = require('express');
-var router = express.Router();
-var AWS = require("aws-sdk");
+const express = require('express');
+const router = express.Router();
+const AWS = require("aws-sdk");
 const multer = require("multer");
 const keys = require("../config/keys");
 const Files = require('./../models/files');
 // var array = require('./arrayFile.js');
 
- var storage = multer.memoryStorage();
- var upload = multer({storage: storage, limits: {fileSize: 10 * 1024 * 1024}}).single('myImage');
+ const storage = multer.memoryStorage();
+ const upload = multer({storage: storage, limits: {fileSize: 10 * 1024 * 1024}}).single('myImage');
 
 // router.get('/upload',(req,res)=>res.render('dashboard'));
 // POST to upload
@@ -19,48 +19,53 @@ router.post('/', (req, res) => {
     const moment = require('moment');    
     //File Upload started
     var startDate = new Date();
-    console.log('%%%%%%%%');
-    console.log(req.file);
+  
+    const uemail = req.user.email;
+    const uname = req.user.name;
+
     const file = req.file;
 
-    console.log(file.fieldname+('-')+Date.now());
+    if(!file){
+      req.flash('error_msg','Please select a file');
+      res.redirect('/dashboard');
+    }
+    else{
 
-    const s3FileURL = keys.s3Url;
+      const s3FileURL = keys.s3Url;
 
-    let s3bucket = new AWS.S3({
-        accessKeyId: keys.AwsAccessKeyId,
-        secretAccessKey: keys.AwsSecretAccessKey,
-        region: keys.region
-    });
+      let s3bucket = new AWS.S3({
+          accessKeyId: keys.AwsAccessKeyId,
+          secretAccessKey: keys.AwsSecretAccessKey,
+          region: keys.region
+      });
 
-    //Location of store for file upload
+      //Location of store for file upload
 
-    var params = {
-        Bucket: keys.bucketName,
-        Key: file.fieldname+('-')+Date.now(),
-        Body: file.buffer,
-        ContentType: file.mimetype,
-        ACL: "public-read"
-    };
+      var params = {
+          Bucket: keys.bucketName,
+          Key: file.fieldname+('-')+Date.now(),
+          Body: file.buffer,
+          ContentType: file.mimetype,
+          ACL: "public-read"
+      };
 
-    
-
-    s3bucket.upload(params, function (err, data) {
+      s3bucket.upload(params, function (err, data) {
         var cnt = "";
 
         if (err) {
             res.status(500).json({error: true, Message: err});
         } else {
             //success
-            res.send(data.Location);
+            req.flash('success_msg','File Uploaded!');
+            res.redirect('/dashboard');
+            //res.send(data.Location);
 
             //File Upload ended       
             var endDate   = new Date();
-            console.log(`Difference in seconds:`+(endDate - startDate) / 1000);
             
             const newFile = new Files({
-              user : 'Manish Lokhande',
-              email : 'manish@gmail.com',
+              user : uname,
+              email : uemail,
               fileUrl:data.Location,
               fileName: file.originalname,
               fileDesc: file.originalname,
@@ -71,15 +76,18 @@ router.post('/', (req, res) => {
             Files.findOne({ fileName:file.originalname })
             .then( (fileName) => {
 
-                newFile.update()
+                newFile.save()
                 .then(file => {
-                  req.flash('success_msg','File Uploaded!!');
+                  console.log('File Uploaded');
               })
               .catch(err=>console.log(err));
             });
 
         }
     });
+
+    }
+  
   });
 });
 
