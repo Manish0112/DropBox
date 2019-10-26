@@ -15,7 +15,6 @@
     </div>
   </nav>
   <br/><br/>
-  <br/><br/> 
   <% include ./partials/messages %>
   <br />
   <%= typeof msg != 'undefined' ? msg : '' %>
@@ -30,11 +29,11 @@
           <input class="file-path validate" type="text">
         </div>
       </div>
-      <button type="submit" class="btn">Submit</button>
+      <button type="submit" class="btn">Upload</button>
     </form>
     <br/><br/>
     <br/><br/> 
-
+    <h4><u>File Details</u></h4>
     <table>
       <thead>
         <tr>
@@ -65,3 +64,27 @@
 
     <br/><br/>
     <br/><br/> 
+    <%if (logins.length > 0) { %>
+      <h4><u>User Details</u></h4>
+    <table>
+        <thead>
+          <tr>
+              <th>User Name</th>
+              <th>Email</th>
+          </tr>
+        </thead>
+  
+        <tbody>
+            <% logins.forEach(function (logins) { %>
+              <tr>
+                  <td><%=logins.name %></td>
+                  <td><%=logins.email %></td>
+              </tr>
+          <% }) %>
+          
+        </tbody>
+      </table>
+
+      <br/><br/>
+    <br/><br/> 
+      <% } %>
